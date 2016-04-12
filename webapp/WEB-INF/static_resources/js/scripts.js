@@ -28,7 +28,7 @@ function onSuccess(json, status){
 }
 
 function onError(xhr, status) {
-  alert("error");
+  alert("error while addAnswer");
 }
 
 $(".qna-comment").on("click", ".form-delete", deleteAnswer);
