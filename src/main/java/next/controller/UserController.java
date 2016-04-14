@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,24 +56,25 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/login", method = RequestMethod.POST)
-	public String login(@RequestParam String userId, @RequestParam String password, HttpSession session) throws Exception {
-		User user = userDao.findByUserId(userId);
+	public String login(User user, HttpSession session) throws Exception {
 		
-		if (user == null) {
+		User loginUser = userDao.findByUserId(user.getUserId());
+		
+		if (loginUser == null) {
             throw new NullPointerException("사용자를 찾을 수 없습니다.");
         }
         
-        if (user.matchPassword(password)) {
-            session.setAttribute("user", user);
+        if (loginUser.matchPassword(user.getPassword())) {
+            session.setAttribute("user", loginUser);
             return "redirect:/";
         } else {
             throw new IllegalStateException("비밀번호가 틀립니다.");
         }
 	}
 	
-	@RequestMapping(value="/profile", method = RequestMethod.GET)
-	public String profile(Model model, @RequestParam String userId) throws Exception {
-		model.addAttribute("user", userDao.findByUserId(userId));
+	@RequestMapping(value="/{id}", method = RequestMethod.GET)
+	public String profile(@PathVariable String id, Model model) throws Exception {
+		model.addAttribute("user", userDao.findByUserId(id));
 		return "/user/profile";
 	}
 	 
@@ -83,10 +85,10 @@ public class UserController {
 		return "redirect:/";
 	}
 	
-	@RequestMapping(value="/edit", method = RequestMethod.GET)
-	public ModelAndView updateUserForm(@RequestParam String userId, HttpSession session) throws Exception {
+	@RequestMapping(value="/{id}/edit", method = RequestMethod.GET)
+	public ModelAndView edit(@PathVariable String id, HttpSession session) throws Exception {
 		
-		User user = userDao.findByUserId(userId);
+		User user = userDao.findByUserId(id);
 		if (!UserSessionUtils.isSameUser(session, user)) {
 			throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
 		}
@@ -96,15 +98,15 @@ public class UserController {
 		return mav;
 	}
 	
-	@RequestMapping(value="/", method= RequestMethod.PUT)
-	public @ResponseBody String updateUser(@RequestParam String userId, @RequestParam String password, @RequestParam String name, @RequestParam String email, HttpSession session) throws Exception {
-		User user = userDao.findByUserId(userId);
+	@RequestMapping(value="/{id}", method= RequestMethod.PUT)
+	public String update(@PathVariable String id, User user, HttpSession session) throws Exception {
+		//User updateUser = userDao.findByUserId(user.getUserId());
 		
 		if (!UserSessionUtils.isSameUser(session, user)) {
 			throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
 		}
 		
-		User updateUser = new User(userId, password, name, email);
+		User updateUser = new User(user.getUserId(), user.getPassword(), user.getName(), user.getEmail());
 		userDao.update(updateUser);
 		
 		return "redirect:/";
