@@ -5,9 +5,12 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import next.dao.UserDao;
@@ -21,22 +24,32 @@ public class UserController {
 	
 	private UserDao userDao = UserDao.getInstance();
 	
-	@RequestMapping(value = "/form", method = RequestMethod.GET)
-	public String createUserForm() throws Exception {
+	@RequestMapping(value="", method = RequestMethod.GET)
+	public ModelAndView index(HttpSession session) throws Exception {
+		if (!UserSessionUtils.isLogined(session)) {
+			return new ModelAndView("redirect:/users/loginForm");
+		}
+		
+		ModelAndView mav = new ModelAndView("/user/list");
+		mav.addObject("users",userDao.findAll());
+		return mav;
+	}
+	
+	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	public String form() throws Exception {
 		logger.debug("inside");
 		return "/user/form";
 	}
 	
-	@RequestMapping(value="/create", method=RequestMethod.POST)
-	public String createUser(@RequestParam String userId, @RequestParam String password, @RequestParam String name, @RequestParam String email) throws Exception {
-		
-		User user = new User (userId, password, name, email);
+	@RequestMapping(value="", method=RequestMethod.POST)
+	public String create(User user) throws Exception {
+		//User user = new User (userId, password, name, email);
 		userDao.insert(user);
 		
 		return "redirect:/";
 	}
 	
-	@RequestMapping(value="/loginForm", method = RequestMethod.GET)
+	@RequestMapping(value="/login", method = RequestMethod.GET)
 	public String loginForm() throws Exception {
 		return "/user/login";
 	}
@@ -58,24 +71,11 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/profile", method = RequestMethod.GET)
-	public ModelAndView profile(@RequestParam String userId) throws Exception {
-		ModelAndView mav = new ModelAndView("/user/profile");
-		mav.addObject("user", userDao.findByUserId(userId));
-		return mav;
+	public String profile(Model model, @RequestParam String userId) throws Exception {
+		model.addAttribute("user", userDao.findByUserId(userId));
+		return "/user/profile";
 	}
 	 
-	@RequestMapping(value="", method = RequestMethod.GET)
-	public ModelAndView list(HttpSession session) throws Exception {
-		if (!UserSessionUtils.isLogined(session)) {
-			return new ModelAndView("redirect:/users/loginForm");
-		}
-		
-		ModelAndView mav = new ModelAndView("/user/list");
-		mav.addObject("users",userDao.findAll());
-		return mav;
-	}
-	
-	
 	@RequestMapping(value="/logout", method= RequestMethod.GET)
 	public String logout(HttpSession session) throws Exception {
 		session.removeAttribute("user");
@@ -83,7 +83,7 @@ public class UserController {
 		return "redirect:/";
 	}
 	
-	@RequestMapping(value="/updateForm", method = RequestMethod.GET)
+	@RequestMapping(value="/edit", method = RequestMethod.GET)
 	public ModelAndView updateUserForm(@RequestParam String userId, HttpSession session) throws Exception {
 		
 		User user = userDao.findByUserId(userId);
@@ -96,8 +96,8 @@ public class UserController {
 		return mav;
 	}
 	
-	@RequestMapping(value="/update", method= RequestMethod.POST)
-	public String updateUser(@RequestParam String userId, @RequestParam String password, @RequestParam String name, @RequestParam String email, HttpSession session) throws Exception {
+	@RequestMapping(value="/", method= RequestMethod.PUT)
+	public @ResponseBody String updateUser(@RequestParam String userId, @RequestParam String password, @RequestParam String name, @RequestParam String email, HttpSession session) throws Exception {
 		User user = userDao.findByUserId(userId);
 		
 		if (!UserSessionUtils.isSameUser(session, user)) {

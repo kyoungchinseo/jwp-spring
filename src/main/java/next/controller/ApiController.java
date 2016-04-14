@@ -1,19 +1,17 @@
 package next.controller;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.View;
-
-import com.fasterxml.jackson.annotation.JsonView;
 
 import next.dao.AnswerDao;
 import next.dao.QuestionDao;
@@ -41,11 +39,12 @@ public class ApiController {
 	}
 	
 	@RequestMapping(value = "/addAnswer", method=RequestMethod.POST)
-	public ModelAndView addAnswer(@RequestParam String contents, @RequestParam String questionId, HttpSession session) throws Exception {
+	public Map<String, Object> addAnswer(@RequestParam String contents, @RequestParam String questionId, HttpSession session) throws Exception {
 		logger.debug("addAnswer post method call this method");
-		
+		Map<String, Object> resultMap = new HashMap<String, Object>();
 		if (!UserSessionUtils.isLogined(session)) {
-			return new ModelAndView("jsonview").addObject("result",	Result.fail("need login"));
+			resultMap.put("result", Result.fail("Login is required"));
+			return resultMap;
 		}
 		
 		User user = UserSessionUtils.getUserFromSession(session);
@@ -55,12 +54,24 @@ public class ApiController {
 		Answer savedAnswer = answerDao.insert(answer);
 		questionDao.updateCountOfAnswer(savedAnswer.getQuestionId());
 		
-		return new ModelAndView("jsonview").addObject("answer", savedAnswer).addObject("result",Result.ok());
+		resultMap.put("answer", savedAnswer);
+		resultMap.put("result", Result.ok());
+		return resultMap;
 	}
 	
-	@RequestMapping("/deleteAnswer")
-	public String deleteAnswer() throws Exception {
-		return null;
+	@RequestMapping(value="/deleteAnswer", method=RequestMethod.POST)
+	public Map<String,Object> deleteAnswer(@RequestParam String answerId) throws Exception {
+		
+		Map<String,Object> resultMap = new HashMap<String,Object>();
+		long id = Long.parseLong(answerId);
+		try {
+			answerDao.delete(id);
+			resultMap.put("result", Result.ok());
+		} catch(Exception e) {
+			resultMap.put("result", Result.fail(e.getMessage()));
+		}
+		
+		return resultMap;
 	}
 	
 	
