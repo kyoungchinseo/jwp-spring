@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import next.annotation.LoginUser;
 import next.dao.UserDao;
 import next.model.User;
 
@@ -26,14 +27,16 @@ public class UserController {
 	private UserDao userDao = UserDao.getInstance();
 	
 	@RequestMapping(value="", method = RequestMethod.GET)
-	public ModelAndView index(HttpSession session) throws Exception {
-		if (!UserSessionUtils.isLogined(session)) {
-			return new ModelAndView("redirect:/users/loginForm");
+	public String index(@LoginUser User loginUser, Model model) throws Exception {
+		//if (!UserSessionUtils.isLogined(session)) {
+		logger.debug("list");
+		logger.debug("loginUser: {}", loginUser);
+		if (loginUser.getUserId() == null) {
+			return "redirect:/users/login";
 		}
 		
-		ModelAndView mav = new ModelAndView("/user/list");
-		mav.addObject("users",userDao.findAll());
-		return mav;
+		model.addAttribute("users",userDao.findAll());
+		return "/user/list";
 	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
