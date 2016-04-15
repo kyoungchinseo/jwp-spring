@@ -15,6 +15,10 @@ public class Question {
 	
 	private int countOfComment;
 	
+	public Question() {
+		
+	}
+	
 	public Question(String writer, String title, String contents) {
 		this(0, writer, title, contents, new Date(), 0);
 	}	
@@ -33,26 +37,46 @@ public class Question {
 		return questionId;
 	}
 	
+	public void setQuestionId(long questionId) {
+		this.questionId = questionId;
+	}
+	
 	public String getWriter() {
 		return writer;
+	}
+	
+	public void setWriter(String writer) {
+		this.writer = writer;
 	}
 
 	public String getTitle() {
 		return title;
 	}
+	
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
 	public String getContents() {
 		return contents;
+	}
+	
+	public void setContents(String contents) {
+		this.contents = contents;
 	}
 
 	public Date getCreatedDate() {
 		return createdDate;
 	}
 	
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+	
 	public long getTimeFromCreateDate() {
 		return this.createdDate.getTime();
 	}
-
+	
 	public int getCountOfComment() {
 		return countOfComment;
 	}

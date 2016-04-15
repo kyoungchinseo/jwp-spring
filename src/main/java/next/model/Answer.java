@@ -13,6 +13,10 @@ public class Answer {
 
 	private long questionId;
 	
+	public Answer() {
+		
+	}
+	
 	public Answer(String writer, String contents, long questionId) {
 		this(0, writer, contents, new Date(), questionId);
 	}
@@ -29,16 +33,32 @@ public class Answer {
 		return answerId;
 	}
 	
+	public void setAnswerId(long answerId) {
+		this.answerId = answerId;
+	}
+	
 	public String getWriter() {
 		return writer;
+	}
+	
+	public void setWriter(String writer) {
+		this.writer = writer;
 	}
 
 	public String getContents() {
 		return contents;
 	}
+	
+	public void setContents(String contents) {
+		this.contents = contents;
+	}
 
 	public Date getCreatedDate() {
 		return createdDate;
+	}
+	
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
 	}
 	
 	public long getTimeFromCreateDate() {
@@ -47,6 +67,10 @@ public class Answer {
 	
 	public long getQuestionId() {
 		return questionId;
+	}
+	
+	public void setQuestionId(long questionId) {
+		this.questionId = questionId;
 	}
 	
 	@Override

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import next.annotation.LoginUser;
 import next.dao.AnswerDao;
 import next.dao.QuestionDao;
 import next.model.Answer;
@@ -39,16 +40,16 @@ public class ApiController {
 	}
 	
 	@RequestMapping(value = "/addAnswer", method=RequestMethod.POST)
-	public Map<String, Object> addAnswer(@RequestParam String contents, @RequestParam String questionId, HttpSession session) throws Exception {
+	public Map<String, Object> addAnswer(@RequestParam String contents, @RequestParam String questionId, @LoginUser User loginUser) throws Exception {
 		logger.debug("addAnswer post method call this method");
 		Map<String, Object> resultMap = new HashMap<String, Object>();
-		if (!UserSessionUtils.isLogined(session)) {
+		//if (!UserSessionUtils.isLogined(session)) {
+		if (loginUser == null) {
 			resultMap.put("result", Result.fail("Login is required"));
 			return resultMap;
 		}
 		
-		User user = UserSessionUtils.getUserFromSession(session);
-		Answer answer = new Answer(user.getUserId(), contents, Long.parseLong(questionId));
+		Answer answer = new Answer(loginUser.getUserId(), contents, Long.parseLong(questionId));
 		logger.debug("answer: {} ", answer);
 		
 		Answer savedAnswer = answerDao.insert(answer);

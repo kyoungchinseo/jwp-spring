@@ -31,9 +31,7 @@ public class UserController {
 		logger.debug("list");
 		logger.debug("loginUser: {}", loginUser);
 		if (loginUser == null) {
-			return "redirect:/users/login";
-		}
-		if (loginUser.getUserId() == null) {
+			model.addAttribute("user", new User());
 			return "redirect:/users/login";
 		}
 		
@@ -42,8 +40,9 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
-	public String form() throws Exception {
+	public String form(Model model) throws Exception {
 		logger.debug("inside");
+		model.addAttribute("user", new User());
 		return "/user/form";
 	}
 	
@@ -56,7 +55,8 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/login", method = RequestMethod.GET)
-	public String loginForm() throws Exception {
+	public String loginForm(Model model) throws Exception {
+		model.addAttribute("user", new User());
 		return "/user/login";
 	}
 	

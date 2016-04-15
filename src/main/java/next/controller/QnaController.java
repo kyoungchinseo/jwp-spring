@@ -48,24 +48,28 @@ public class QnaController {
 	}
 
 	@RequestMapping(value="/form", method=RequestMethod.GET)
-	public String questionForm(@LoginUser User loginUser) throws Exception {
+	public String questionForm(@LoginUser User loginUser, Model model) throws Exception {
 		//if (!UserSessionUtils.isLogined(session)) {
 		if (loginUser == null) {
-			return "redirect:/users/loginForm";
+			model.addAttribute("user", new User());
+			return "redirect:/users/login";
 		}
+		model.addAttribute("question", new Question());
 		return "/qna/form";
 	}
 	
 	@RequestMapping(value="/create", method=RequestMethod.POST)
-	public String createQuestion(@RequestParam String title, @RequestParam String contents, @LoginUser User loginUser) throws Exception {
+	//public String createQuestion(@RequestParam String title, @RequestParam String contents, @LoginUser User loginUser, Model model) throws Exception {
+	public String createQuestion(Question question, @LoginUser User loginUser, Model model) throws Exception {
 		//if (!UserSessionUtils.isLogined(session)) {
 		if (loginUser == null) {
-			return "redirect:/users/loginForm";
+			model.addAttribute("user", new User());
+			return "redirect:/users/login";
 		}
 		
 		//User user = UserSessionUtils.getUserFromSession(session);
-		Question question = new Question(loginUser.getUserId(), title, contents);
-		questionDao.insert(question);
+		Question createdQuestion = new Question(loginUser.getUserId(), question.getTitle(), question.getContents());
+		questionDao.insert(createdQuestion);
 		
 		
 		return "redirect:/";
@@ -75,7 +79,8 @@ public class QnaController {
 	public String updateQuestionForm(@RequestParam String questionId, @LoginUser User loginUser, Model model) throws Exception {
 		//if (!UserSessionUtils.isLogined(session)) {
 		if (loginUser == null) {
-			return "redirect:/users/loginForm";
+			model.addAttribute("user", new User());
+			return "redirect:/users/login";
 		}
 		
 		long id = Long.parseLong(questionId);
@@ -90,23 +95,24 @@ public class QnaController {
 	}
 	
 	@RequestMapping(value="/update", method=RequestMethod.POST)
-	public String updateQuestion(@RequestParam String questionId, @RequestParam String title, @RequestParam String contents, @LoginUser User loginUser) throws Exception {
+	public String updateQuestion(Question question, @LoginUser User loginUser, Model model) throws Exception {
 		
 		//if (!UserSessionUtils.isLogined(session)) {
 		if (loginUser == null) {
-			return "redirect:/users/loginForm"; 
+			model.addAttribute("user", new User());
+			return "redirect:/users/login"; 
 		}
 		
-		long id = Long.parseLong(questionId);
-		Question question = questionDao.findById(id);
+		long id = question.getQuestionId();
+		Question oldQuestion = questionDao.findById(id);
 		//if (!question.isSameUser(UserSessionUtils.getUserFromSession(session))) {
-		if (!question.isSameUser(loginUser)) {
+		if (!oldQuestion.isSameUser(loginUser)) {
 			throw new IllegalStateException("다른 사용자가 쓴 글을 수정할 수 없습니다.");
 		}
 		
-		Question newQuestion = new Question(question.getWriter(), title, contents);
-		question.update(newQuestion);
-		questionDao.update(question);
+		Question newQuestion = new Question(oldQuestion.getWriter(), question.getTitle(), question.getContents());
+		oldQuestion.update(newQuestion);
+		questionDao.update(oldQuestion);
 		return "redirect:/";
 	}
 	
@@ -127,19 +133,5 @@ public class QnaController {
 		}
 		
 	}
-	
 																																																																																																																																																																																																																																																																																																																																																																																																		
-	/*
-	// mappings.put("/qna/show", new ShowQuestionController());
-	//	mappings.put("/qna/form", new CreateFormQuestionController());
-	//	mappings.put("/qna/create", new CreateQuestionController());
-	//	mappings.put("/qna/updateForm", new UpdateFormQuestionController());
-	//	mappings.put("/qna/update", new UpdateQuestionController());
-	//	mappings.put("/qna/delete", new DeleteQuestionController());
-	//	mappings.put("/api/qna/deleteQuestion", new ApiDeleteQuestionController());
-		mappings.put("/api/qna/list", new ApiListQuestionController());
-		mappings.put("/api/qna/addAnswer", new AddAnswerController());
-		mappings.put("/api/qna/deleteAnswer", new DeleteAnswerController()); 
-	 */
-	
 }
