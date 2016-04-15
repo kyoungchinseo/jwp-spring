@@ -28,9 +28,11 @@ public class UserController {
 	
 	@RequestMapping(value="", method = RequestMethod.GET)
 	public String index(@LoginUser User loginUser, Model model) throws Exception {
-		//if (!UserSessionUtils.isLogined(session)) {
 		logger.debug("list");
 		logger.debug("loginUser: {}", loginUser);
+		if (loginUser == null) {
+			return "redirect:/users/login";
+		}
 		if (loginUser.getUserId() == null) {
 			return "redirect:/users/login";
 		}
@@ -67,9 +69,9 @@ public class UserController {
             throw new NullPointerException("사용자를 찾을 수 없습니다.");
         }
         
-        if (loginUser.matchPassword(user.getPassword())) {
+        if (loginUser.matchPassword(user.getPassword())) { // 사용자가 있고 패스워드까지 맞으면 세션 등
             session.setAttribute("user", loginUser);
-            return "redirect:/";
+        	return "redirect:/";
         } else {
             throw new IllegalStateException("비밀번호가 틀립니다.");
         }
@@ -89,23 +91,23 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/{id}/edit", method = RequestMethod.GET)
-	public ModelAndView edit(@PathVariable String id, HttpSession session) throws Exception {
+	public String edit(@PathVariable String id, @LoginUser User loginUser, Model model) throws Exception {
 		
 		User user = userDao.findByUserId(id);
-		if (!UserSessionUtils.isSameUser(session, user)) {
+		if (!user.isSameUser(loginUser)) {
 			throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
 		}
 		
-		ModelAndView mav = new ModelAndView("/user/updateForm");
-		mav.addObject("user",user);
-		return mav;
+		model.addAttribute("user", user);
+		return "/user/updateForm";
 	}
 	
 	@RequestMapping(value="/{id}", method= RequestMethod.PUT)
-	public String update(@PathVariable String id, User user, HttpSession session) throws Exception {
+	public String update(@PathVariable String id, User user, @LoginUser User loginUser) throws Exception {
 		//User updateUser = userDao.findByUserId(user.getUserId());
 		
-		if (!UserSessionUtils.isSameUser(session, user)) {
+		//if (!UserSessionUtils.isSameUser(session, user)) {
+		if (!user.isSameUser(loginUser)) {
 			throw new IllegalStateException("다른 사용자의 정보를 수정할 수 없습니다.");
 		}
 		

@@ -50,6 +50,5 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
     	LoginUserArgumentResolver resolver = new LoginUserArgumentResolver(); 
     	argumentResolvers.add(resolver);
-    	super.addArgumentResolvers(argumentResolvers);
     }
 }
