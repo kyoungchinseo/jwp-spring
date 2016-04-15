@@ -49,7 +49,6 @@ public class QnaController {
 
 	@RequestMapping(value="/form", method=RequestMethod.GET)
 	public String questionForm(@LoginUser User loginUser, Model model) throws Exception {
-		//if (!UserSessionUtils.isLogined(session)) {
 		if (loginUser == null) {
 			model.addAttribute("user", new User());
 			return "redirect:/users/login";
@@ -59,15 +58,12 @@ public class QnaController {
 	}
 	
 	@RequestMapping(value="/create", method=RequestMethod.POST)
-	//public String createQuestion(@RequestParam String title, @RequestParam String contents, @LoginUser User loginUser, Model model) throws Exception {
 	public String createQuestion(Question question, @LoginUser User loginUser, Model model) throws Exception {
-		//if (!UserSessionUtils.isLogined(session)) {
 		if (loginUser == null) {
 			model.addAttribute("user", new User());
 			return "redirect:/users/login";
 		}
 		
-		//User user = UserSessionUtils.getUserFromSession(session);
 		Question createdQuestion = new Question(loginUser.getUserId(), question.getTitle(), question.getContents());
 		questionDao.insert(createdQuestion);
 		
@@ -77,7 +73,6 @@ public class QnaController {
 	
 	@RequestMapping(value="/updateForm", method=RequestMethod.GET)
 	public String updateQuestionForm(@RequestParam String questionId, @LoginUser User loginUser, Model model) throws Exception {
-		//if (!UserSessionUtils.isLogined(session)) {
 		if (loginUser == null) {
 			model.addAttribute("user", new User());
 			return "redirect:/users/login";
@@ -85,7 +80,6 @@ public class QnaController {
 		
 		long id = Long.parseLong(questionId);
 		Question question = questionDao.findById(id);
-		//if (!question.isSameUser(UserSessionUtils.getUserFromSession(session))) {
 		if (!question.isSameUser(loginUser)) {
 			throw new IllegalStateException("다른 사용자가 쓴 글을 수정할 수 없습니다.");
 		}
@@ -96,8 +90,6 @@ public class QnaController {
 	
 	@RequestMapping(value="/update", method=RequestMethod.POST)
 	public String updateQuestion(Question question, @LoginUser User loginUser, Model model) throws Exception {
-		
-		//if (!UserSessionUtils.isLogined(session)) {
 		if (loginUser == null) {
 			model.addAttribute("user", new User());
 			return "redirect:/users/login"; 
@@ -105,7 +97,6 @@ public class QnaController {
 		
 		long id = question.getQuestionId();
 		Question oldQuestion = questionDao.findById(id);
-		//if (!question.isSameUser(UserSessionUtils.getUserFromSession(session))) {
 		if (!oldQuestion.isSameUser(loginUser)) {
 			throw new IllegalStateException("다른 사용자가 쓴 글을 수정할 수 없습니다.");
 		}
@@ -118,7 +109,6 @@ public class QnaController {
 	
 	@RequestMapping(value="/delete", method=RequestMethod.POST)
 	public ModelAndView deleteQuestion(@RequestParam String questionId, @LoginUser User loginUser) throws Exception {
-		//if (!UserSessionUtils.isLogined(session)) {
 		if (loginUser == null) {
 			return new ModelAndView("redirect:/users/loginForm");
 		}

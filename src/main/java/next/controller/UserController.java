@@ -48,7 +48,6 @@ public class UserController {
 	
 	@RequestMapping(value="", method=RequestMethod.POST)
 	public String create(User user) throws Exception {
-		//User user = new User (userId, password, name, email);
 		userDao.insert(user);
 		
 		return "redirect:/";

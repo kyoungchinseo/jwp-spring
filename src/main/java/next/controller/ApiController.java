@@ -43,7 +43,6 @@ public class ApiController {
 	public Map<String, Object> addAnswer(@RequestParam String contents, @RequestParam String questionId, @LoginUser User loginUser) throws Exception {
 		logger.debug("addAnswer post method call this method");
 		Map<String, Object> resultMap = new HashMap<String, Object>();
-		//if (!UserSessionUtils.isLogined(session)) {
 		if (loginUser == null) {
 			resultMap.put("result", Result.fail("Login is required"));
 			return resultMap;
