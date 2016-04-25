@@ -4,22 +4,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import next.model.User;
-import core.jdbc.JdbcTemplate;
-import core.jdbc.RowMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 
+import next.model.User;
+
+@Repository
 public class UserDao {
 	private static UserDao userDao;
-	private JdbcTemplate jdbcTemplate = JdbcTemplate.getInstance();
 	
-	private UserDao() {}
-	
-	public static UserDao getInstance() {
-		if (userDao == null) {
-			userDao = new UserDao();
-		}
-		return userDao;
-	}
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 	
     public void insert(User user) {
         String sql = "INSERT INTO USERS VALUES (?, ?, ?, ?)";
@@ -34,7 +31,7 @@ public class UserDao {
         
         RowMapper<User> rm = new RowMapper<User>() {
             @Override
-            public User mapRow(ResultSet rs) throws SQLException {
+            public User mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new User(rs.getString("userId"), 
                         rs.getString("password"), 
                         rs.getString("name"),
@@ -50,7 +47,7 @@ public class UserDao {
         
         RowMapper<User> rm = new RowMapper<User>() {
             @Override
-            public User mapRow(ResultSet rs) throws SQLException {
+            public User mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new User(rs.getString("userId"), 
                         rs.getString("password"), 
                         rs.getString("name"),

@@ -3,6 +3,8 @@ package next.controller.qna;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import next.CannotOperateException;
 import next.dao.AnswerDao;
 import next.dao.QuestionDao;
@@ -14,6 +16,7 @@ import next.service.QnaService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,10 +32,13 @@ import core.web.argumentresolver.LoginUser;
 public class ApiQuestionController {
 	private Logger log = LoggerFactory.getLogger(ApiQuestionController.class);
 	
-	private QuestionDao questionDao = QuestionDao.getInstance();
-	private AnswerDao answerDao = AnswerDao.getInstance();
-	private QnaService qnaService = new QnaService(questionDao, answerDao);
-	
+	@Autowired
+	private QuestionDao questionDao;
+	@Autowired
+	private AnswerDao answerDao;
+	@Resource
+	private QnaService qnaService;
+
 	@RequestMapping(value="/{questionId}", method=RequestMethod.DELETE)
 	public Result deleteQuestion(@LoginUser User loginUser, @PathVariable long questionId) throws Exception {
 		try {
