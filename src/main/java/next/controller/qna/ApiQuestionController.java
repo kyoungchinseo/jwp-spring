@@ -5,15 +5,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import next.CannotOperateException;
-import next.dao.AnswerDao;
-import next.dao.QuestionDao;
-import next.model.Answer;
-import next.model.Question;
-import next.model.Result;
-import next.model.User;
-import next.service.QnaService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.collect.Maps;
 
 import core.web.argumentresolver.LoginUser;
+import next.CannotOperateException;
+import next.dao.AnswerDao;
+import next.dao.QuestionDao;
+import next.model.Answer;
+import next.model.Question;
+import next.model.Result;
+import next.model.User;
+import next.service.QnaService;
 
 @RestController
 @RequestMapping("/api/questions")
