@@ -49,4 +49,6 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         // Serving static files using the Servlet container's default Servlet.
         configurer.enable();
     }    
+    
+
 }
